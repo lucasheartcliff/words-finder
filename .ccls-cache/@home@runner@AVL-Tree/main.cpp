@@ -1,19 +1,24 @@
 #include <iostream>
-#include <iterator>
+#include <fstream>
 #include <list>
 #include <set>
 #include <string>
 
+using std::list; 
+using std::set;
+using std::string;
+
 class FileNode {
   unsigned int fileIndex;
-  unsigned int count;
-  std::set<unsigned int> lines;
+  unsigned long long count;
+  set<unsigned long long> lines;
 };
 
 class WordNode {
-  std::string word;
+  string word;
   unsigned long long count;
-  std::list<FileNode> files;
+  list<FileNode> files;
 };
+
 
 int main() { std::cout << "Hello World!\n"; }
