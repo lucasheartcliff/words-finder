@@ -12,7 +12,7 @@ class FileNode {
 
 class WordNode {
   std::string word;
-  unsigned int count;
+  unsigned long long count;
   std::list<FileNode> files;
 };
 
