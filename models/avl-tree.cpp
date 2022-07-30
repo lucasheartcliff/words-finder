@@ -2,6 +2,16 @@
 #include "nodes.cpp"
 #include <iostream>
 
+#include <list>
+#include <map>
+#include <set>
+#include <string>
+
+using std::list;
+using std::map;
+using std::set;
+using std::string;
+
 using namespace std;
 
 // The type T should extends Node class
@@ -12,7 +22,38 @@ class AVLTree {
 
   int stringCompare(string a, string b) { return a.compare(b); }
 
-  
+  bool containsKey(map<unsigned int, FileNode> *generalMap, unsigned int key) {
+    return generalMap->find(key) != generalMap->end();
+  }
+
+  void *mergeOrCreateFileAssociation(WordNode *newT, WordNode *t) {
+    map<unsigned int, FileNode> *filesMap = &newT->files;
+
+    if (filesMap != NULL && filesMap->size()) {
+      map<unsigned int, FileNode>::iterator iter = filesMap.begin();
+
+      while (iter != filesMap.end()) {
+        unsigned int key = iter->first;
+        FileNode value = iter->second;
+
+        if (this->containsKey(&t->files, key)) {
+          FileNode fileNode = t->files[key];
+
+          fileNode.count += value.count;
+          fileNode.lines.insert(value.lines.begin(), value.lines.end());
+        } else {
+          t->files[key] = value;
+        }
+
+        iter++;
+      }
+    }
+  }
+
+  void *mergeEqualsNode(WordNode *newT, WordNode *t) {
+    t->count += newT->count;
+    this->mergeOrCreateFileAssociation(newT, t);
+  }
 
   void makeEmpty(WordNode *t) {
     if (t == NULL)
@@ -22,17 +63,17 @@ class AVLTree {
     delete t;
   }
 
-  WordNode *insert(WordNode *newT, WordNode *t) {
+  WordNode *insert(WordNode *newNode, WordNode *t) {
     if (t == NULL) {
-      t = newT;
+      t = newNode;
     } else {
-      int compareResult = this->stringCompare(newT->word, t->word);
-      
+      int compareResult = this->stringCompare(newNode->word, t->word);
+
       switch (compareResult) {
       case -1:
-        t->left = insert(newT, t->left);
+        t->left = insert(newNode, t->left);
         if (height(t->left) - height(t->right) == 2) {
-          int rCompare = this->stringCompare(newT->word, t->left->word);
+          int rCompare = this->stringCompare(newNode->word, t->left->word);
           if (rCompare == -1)
             t = singleRightRotate(t);
           else if (rCompare == 1)
@@ -40,13 +81,13 @@ class AVLTree {
         }
         break;
       case 0:
-
+        this->mergeEqualsNode(newNode, t);
         break;
 
       case 1:
-        t->right = insert(newT, t->right);
+        t->right = insert(newNode, t->right);
         if (height(t->right) - height(t->right) == 2) {
-          int rCompare = this->stringCompare(newT->word, t->right->word);
+          int rCompare = this->stringCompare(newNode->word, t->right->word);
           if (rCompare == -1)
             t = doubleRightRotate(t);
           else if (rCompare == 1)
@@ -106,18 +147,17 @@ class AVLTree {
       return findMax(t->right);
   }
 
-  WordNode *remove(int x, WordNode *t) {
+  WordNode *remove(string word, WordNode *t) {
     WordNode *temp;
-
+ int compareResult = stringCompare(word,t->word);
     // Element not found
     if (t == NULL)
       return NULL;
-
     // Searching for element
-    else if (x < t->word)
-      t->left = remove(x, t->left);
-    else if (x > t->word)
-      t->right = remove(x, t->right);
+    else if (compareResult == -1)
+      t->left = remove(word, t->left);
+    else if (compareResult == 1)
+      t->right = remove(word, t->right);
 
     // Element found
     // With 2 children
@@ -182,9 +222,9 @@ class AVLTree {
 public:
   AVLTree() { root = NULL; }
 
-  void insert(int x) { root = insert(x, root); }
+  void insert(WordNode* node) { root = insert(node, root); }
 
-  void remove(int x) { root = remove(x, root); }
+  void remove(string x) { root = remove(x, root); }
 
   void display() {
     inorder(root);
