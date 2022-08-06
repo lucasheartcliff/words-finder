@@ -6,6 +6,8 @@
 #include <list>
 #include <string>
 
+#include <algorithm>
+
 #include "./src/models/avl-tree.cpp"
 #include "./src/models/nodes.cpp"
 #include "./src/utils.cpp"
@@ -14,6 +16,19 @@ using std::advance;
 using std::function;
 using std::string;
 
+string normalizeWord(string word) {
+  string normalizedWord = word;
+  normalizedWord = trim(normalizedWord);
+  
+  normalizedWord.erase(std::remove_if(
+      normalizedWord.begin(), normalizedWord.end(),
+      [](char c) {
+    return c == ',' || c == '.' || c == '!' || c == '?'; }), normalizedWord.end());
+  
+  normalizedWord = toUpperCase(normalizedWord);
+  return normalizedWord;
+}
+
 void a(string directory, string selectedWord) {
   print(directory);
 
@@ -21,12 +36,18 @@ void a(string directory, string selectedWord) {
 
   AVLTree *tree = new AVLTree();
 
-  function<void(string)> callback = [](string w) {
-    trim(w);
-    toUpperCase(w);
-    string formattedWord = w;
+  print(normalizeWord("         test."));
+  function<void(string)> callback = [](string line) {
+    std::vector<std::string> lineWordsArray;
 
-    print(formattedWord);
+    split(line, lineWordsArray, ' ');
+    for (auto &w : lineWordsArray) {
+      string formattedWord = normalizeWord(w);
+      if (formattedWord == "")
+        continue;
+
+      // print(formattedWord);
+    }
   };
 
   for (int i = 0; i < files.size(); i++) {
@@ -34,7 +55,7 @@ void a(string directory, string selectedWord) {
     advance(iter, i);
     string filePath = *iter;
     string fullFilePath = directory + filePath;
-    
+
     print(fullFilePath);
 
     readFile(fullFilePath, callback);
