@@ -2,12 +2,11 @@
 
 #include <vector>
 #include <map>
-#include <set>
+#include <unordered_set>
 #include <string>
 
 using std::vector;
 using std::map;
-using std::set;
 using std::string;
 
 using namespace std;
@@ -22,7 +21,7 @@ public:
 class FileNode {
 public:
   unsigned long long count;
-  set<unsigned long long> lines;
+  unordered_set<unsigned long long> lines;
 
   string linesToString() {
     string linesString = "";
@@ -47,7 +46,7 @@ public:
   map<unsigned int, FileNode> files;
 
   string toString(vector<string> *fileNames){
-    string wordNodeString = "\n"+word + " : " + "{ count: " + to_string(count) + "}\n";
+    string wordNodeString = "\n"+word + " : " + "{count: " + to_string(count) + "}\n";
 
     for (map<unsigned int, FileNode>::iterator itr = files.begin(); itr != files.end(); ++itr) {
         unsigned int key =  itr->first;

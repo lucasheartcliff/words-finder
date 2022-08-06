@@ -3,12 +3,10 @@
 #include <iostream>
 
 #include <map>
-#include <set>
 #include <string>
 #include <vector>
 
 using std::map;
-using std::set;
 using std::string;
 using std::vector;
 
@@ -30,26 +28,35 @@ class AVLTree {
       return 0;
   }
 
-  bool containsKey(map<unsigned int, FileNode> *generalMap, unsigned int key) {
-    return generalMap->find(key) != generalMap->end();
+  bool containsKey(map<unsigned int, FileNode> generalMap, unsigned int key) {
+    return (generalMap).find(key) != (generalMap).end();
   }
 
   void mergeOrCreateFileAssociation(WordNode *newT, WordNode *t) {
-    map<unsigned int, FileNode> *filesMap = &newT->files;
+    map<unsigned int, FileNode> filesMap = newT->files;
 
-    if (filesMap != NULL && filesMap->size()) {
-      map<unsigned int, FileNode>::iterator iter = filesMap->begin();
+    if ( filesMap.size()) {
+      map<unsigned int, FileNode>::iterator iter = filesMap.begin();
 
-      while (iter != filesMap->end()) {
+      while (iter != filesMap.end()) {
         unsigned int key = iter->first;
         FileNode value = iter->second;
 
-        if (this->containsKey(&t->files, key)) {
+        if (containsKey(t->files, key)) {
+         
           FileNode fileNode = t->files[key];
 
           fileNode.count += value.count;
-          fileNode.lines.insert(value.lines.begin(), value.lines.end());
+
+          for(const unsigned long long line : value.lines){
+            //cout << to_string(line)+"\n";
+             fileNode.lines.insert(line);
+          }
+          
+         // cout << fileNode.toString()+"\n";
+          t->files[key] = fileNode;
         } else {
+         // cout << "not contains\n";
           t->files[key] = value;
         }
 
