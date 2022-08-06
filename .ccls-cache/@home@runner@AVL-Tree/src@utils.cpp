@@ -7,7 +7,6 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-#include <list>
 #include <locale>
 #include <sys/types.h>
 #include <vector>
@@ -48,16 +47,16 @@ void readFile(string path, function<void(string, unsigned long long, unsigned in
   file.close();
 }
 
-list<string> getFilesFromPath(string path) {
+vector<string> getFilesFromPath(string path) {
   struct dirent *entry;
-  list<string> files;
+  vector<string> files;
 
   DIR *directory = opendir(path.c_str());
   if (directory == NULL)
     return files;
 
   while ((entry = readdir(directory)) != NULL) {
-    files.push_front(entry->d_name);
+    files.push_back(entry->d_name);
   }
   return files;
 }

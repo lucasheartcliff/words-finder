@@ -2,15 +2,15 @@
 #include "nodes.cpp"
 #include <iostream>
 
-#include <list>
 #include <map>
 #include <set>
 #include <string>
+#include <vector>
 
-using std::list;
 using std::map;
 using std::set;
 using std::string;
+using std::vector;
 
 using namespace std;
 
@@ -20,7 +20,15 @@ class AVLTree {
 
   WordNode *root;
 
-  int stringCompare(string a, string b) { return a.compare(b); }
+  int stringCompare(string a, string b) {
+    int r = a.compare(b);
+    if (r < 0)
+      return -1;
+    else if (r > 0)
+      return 1;
+    else
+      return 0;
+  }
 
   bool containsKey(map<unsigned int, FileNode> *generalMap, unsigned int key) {
     return generalMap->find(key) != generalMap->end();
@@ -68,7 +76,6 @@ class AVLTree {
       t = newNode;
     } else {
       int compareResult = this->stringCompare(newNode->word, t->word);
-
       switch (compareResult) {
       case -1:
         t->left = insert(newNode, t->left);
@@ -149,7 +156,7 @@ class AVLTree {
 
   WordNode *remove(string word, WordNode *t) {
     WordNode *temp;
- int compareResult = stringCompare(word,t->word);
+    int compareResult = stringCompare(word, t->word);
     // Element not found
     if (t == NULL)
       return NULL;
@@ -211,23 +218,23 @@ class AVLTree {
       return height(t->left) - height(t->right);
   }
 
-  void inorder(WordNode *t) {
+  void inorder(WordNode *t, vector<string> *fileNames) {
     if (t == NULL)
       return;
-    inorder(t->left);
-    cout << t->word << " ";
-    inorder(t->right);
+    inorder(t->left, fileNames);
+    cout << t->toString(fileNames);
+    inorder(t->right, fileNames);
   }
 
 public:
   AVLTree() { root = NULL; }
 
-  void insert(WordNode* node) { root = insert(node, root); }
+  void insert(WordNode *node) { root = insert(node, root); }
 
   void remove(string x) { root = remove(x, root); }
 
-  void display() {
-    inorder(root);
+  void display(vector<string> *fileNames) {
+    inorder(root, fileNames);
     cout << endl;
   }
 };

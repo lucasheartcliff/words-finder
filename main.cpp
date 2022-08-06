@@ -3,7 +3,7 @@
 
 #include <functional>
 #include <iterator>
-#include <list>
+#include <vector>
 #include <string>
 
 #include <algorithm>
@@ -33,7 +33,7 @@ string normalizeWord(string word) {
 void a(string directory, string selectedWord) {
   print(directory);
 
-  list<string> files = getFilesFromPath(directory);
+  vector<string> files = getFilesFromPath(directory);
 
   AVLTree *tree = new AVLTree();
 
@@ -64,17 +64,13 @@ void a(string directory, string selectedWord) {
       };
 
   for (unsigned int i = 0; i < files.size(); i++) {
-    list<string>::iterator iter = files.begin();
-    advance(iter, i);
-    string filePath = *iter;
+    string filePath = files[i];
     string fullFilePath = directory + filePath;
-
-    print(fullFilePath);
 
     readFile(fullFilePath, callback, i);
   }
 
-  tree->display();
+  tree->display(&files);
 }
 
 int main(int argc, char **argv) {
