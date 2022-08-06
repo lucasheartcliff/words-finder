@@ -16,80 +16,99 @@ using std::advance;
 using std::function;
 using std::string;
 
-string normalizeWord(string word) {
+string normalizeWord(string word)
+{
   string normalizedWord = word;
   normalizedWord = trim(normalizedWord);
 
   normalizedWord.erase(
       std::remove_if(
           normalizedWord.begin(), normalizedWord.end(),
-          [](char c) { return c == ',' || c == '.' || c == '!' || c == '?'; }),
+          [](char c)
+          { return c == ',' || c == '.' || c == '!' || c == '?' || c == '\'' || c == '\"' || c == '`'; }),
       normalizedWord.end());
 
   normalizedWord = toUpperCase(normalizedWord);
   return normalizedWord;
 }
 
-void a(string directory, string selectedWord) {
-  print(directory);
-
+void readFilesAndPrint(string directory, string selectedWord)
+{
   vector<string> files = getFilesFromPath(directory);
+
+  string selectedWordNormalized = normalizeWord(selectedWord);
 
   AVLTree *tree = new AVLTree();
 
   function<void(string, unsigned long long, unsigned int)> callback =
-      [&tree](string line, unsigned long long lineNumber, unsigned int fileIndex) {
-        std::vector<std::string> lineWordsArray;
+      [&tree, selectedWordNormalized](string line, unsigned long long lineNumber, unsigned int fileIndex)
+  {
+    std::vector<std::string> lineWordsArray;
 
-        split(line, lineWordsArray, ' ');
-        for (auto &w : lineWordsArray) {
-          string formattedWord = normalizeWord(w);
-          if (formattedWord == "")
-            continue;
+    split(line, lineWordsArray, ' ');
+    for (auto &w : lineWordsArray)
+    {
+      string normalizedWord = normalizeWord(w);
 
-          WordNode *node = new WordNode();
+      if (normalizedWord == "")
+        continue;
 
-          FileNode *fileNode = new FileNode();
+      if (selectedWordNormalized != "" && selectedWordNormalized != normalizedWord)
+        continue;
 
-          fileNode->count = 1;
-          fileNode->lines.insert(lineNumber);
+      WordNode *node = new WordNode();
 
-          node->word = formattedWord;
-          node->count = 1;
+      FileNode *fileNode = new FileNode();
 
-          node->files[fileIndex]=*fileNode;
+      fileNode->count = 1;
+      fileNode->lines.insert(lineNumber);
 
-          tree->insert(node);
-        }
-      };
+      node->word = normalizedWord;
+      node->count = 1;
 
-  for (unsigned int i = 0; i < files.size(); i++) {
+      node->files[fileIndex] = *fileNode;
+
+      tree->insert(node);
+    }
+  };
+  int filesSize = files.size();
+  for (unsigned int i = 0; i < filesSize; i++)
+  {
     string filePath = files[i];
     string fullFilePath = directory + filePath;
+
+    print("Reading file \"" + fullFilePath + "\"...\n");
 
     readFile(fullFilePath, callback, i);
   }
 
-  tree->display(&files);
+  string treeString = tree->toString(&files);
+  print("\n");
+  print(treeString);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   string directory;
-  string selectedWord;
+  string selectedWord = "";
 
-  for (int i = 0; i < argc; ++i) {
+  for (int i = 0; i < argc; ++i)
+  {
     string arg = argv[i];
 
-    if (argc > i + 1) {
+    if (argc > i + 1)
+    {
       string argp = argv[i + 1];
-      if (arg == "-dir") {
+      if (arg == "-dir")
+      {
         directory = argp;
       }
 
-      else if (arg == "-text") {
+      else if (arg == "-text")
+      {
         selectedWord = argp;
       }
     }
   }
-  a(directory, selectedWord);
+  readFilesAndPrint(directory, selectedWord);
 }

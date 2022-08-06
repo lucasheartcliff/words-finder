@@ -46,16 +46,18 @@ public:
   map<unsigned int, FileNode> files;
 
   string toString(vector<string> *fileNames){
-    string wordNodeString = "\n"+word + " : " + "{count: " + to_string(count) + "}\n";
+    string wordNodeString = "\n"+word + " : " + "{count: " + to_string(count) +", files:{";
 
-    for (map<unsigned int, FileNode>::iterator itr = files.begin(); itr != files.end(); ++itr) {
+    for (map<unsigned int, FileNode>::iterator itr = files.begin(); itr != files.end(); itr++) {
         unsigned int key =  itr->first;
         string fileName = (*fileNames)[key];
       
         FileNode fileNode = itr->second;
 
-        wordNodeString += "   " +fileName + " : {" + fileNode.toString() + "}\n"; 
+        wordNodeString += fileName + ": {" + fileNode.toString() + "}, "; 
     }
+
+    wordNodeString += "}}\n";
 
     return wordNodeString;
   }

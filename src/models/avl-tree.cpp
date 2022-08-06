@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <unordered_set>
 
 using std::map;
 using std::string;
@@ -14,11 +15,13 @@ using namespace std;
 
 // The type T should extends Node class
 
-class AVLTree {
+class AVLTree
+{
 
   WordNode *root;
 
-  int stringCompare(string a, string b) {
+  int stringCompare(string a, string b)
+  {
     int r = a.compare(b);
     if (r < 0)
       return -1;
@@ -28,35 +31,37 @@ class AVLTree {
       return 0;
   }
 
-  bool containsKey(map<unsigned int, FileNode> generalMap, unsigned int key) {
+  bool containsKey(map<unsigned int, FileNode> generalMap, unsigned int key)
+  {
     return (generalMap).find(key) != (generalMap).end();
   }
 
-  void mergeOrCreateFileAssociation(WordNode *newT, WordNode *t) {
+  void mergeOrCreateFileAssociation(WordNode *newT, WordNode *t)
+  {
     map<unsigned int, FileNode> filesMap = newT->files;
 
-    if ( filesMap.size()) {
+    if (filesMap.size())
+    {
       map<unsigned int, FileNode>::iterator iter = filesMap.begin();
 
-      while (iter != filesMap.end()) {
+      while (iter != filesMap.end())
+      {
         unsigned int key = iter->first;
         FileNode value = iter->second;
 
-        if (containsKey(t->files, key)) {
-         
+        if (containsKey(t->files, key))
+        {
           FileNode fileNode = t->files[key];
 
           fileNode.count += value.count;
 
-          for(const unsigned long long line : value.lines){
-            //cout << to_string(line)+"\n";
-             fileNode.lines.insert(line);
-          }
-          
-         // cout << fileNode.toString()+"\n";
+          unordered_set<unsigned long long> *lines = &fileNode.lines;
+
+          lines->insert(value.lines.begin(), value.lines.end());
           t->files[key] = fileNode;
-        } else {
-         // cout << "not contains\n";
+        }
+        else
+        {
           t->files[key] = value;
         }
 
@@ -65,12 +70,14 @@ class AVLTree {
     }
   }
 
-  void mergeEqualsNode(WordNode *newT, WordNode *t) {
+  void mergeEqualsNode(WordNode *newT, WordNode *t)
+  {
     t->count += newT->count;
     this->mergeOrCreateFileAssociation(newT, t);
   }
 
-  void makeEmpty(WordNode *t) {
+  void makeEmpty(WordNode *t)
+  {
     if (t == NULL)
       return;
     makeEmpty(t->left);
@@ -78,15 +85,21 @@ class AVLTree {
     delete t;
   }
 
-  WordNode *insert(WordNode *newNode, WordNode *t) {
-    if (t == NULL) {
+  WordNode *insert(WordNode *newNode, WordNode *t)
+  {
+    if (t == NULL)
+    {
       t = newNode;
-    } else {
+    }
+    else
+    {
       int compareResult = this->stringCompare(newNode->word, t->word);
-      switch (compareResult) {
+      switch (compareResult)
+      {
       case -1:
         t->left = insert(newNode, t->left);
-        if (height(t->left) - height(t->right) == 2) {
+        if (height(t->left) - height(t->right) == 2)
+        {
           int rCompare = this->stringCompare(newNode->word, t->left->word);
           if (rCompare == -1)
             t = singleRightRotate(t);
@@ -100,7 +113,8 @@ class AVLTree {
 
       case 1:
         t->right = insert(newNode, t->right);
-        if (height(t->right) - height(t->right) == 2) {
+        if (height(t->right) - height(t->right) == 2)
+        {
           int rCompare = this->stringCompare(newNode->word, t->right->word);
           if (rCompare == -1)
             t = doubleRightRotate(t);
@@ -115,7 +129,8 @@ class AVLTree {
     return t;
   }
 
-  WordNode *singleRightRotate(WordNode *&t) {
+  WordNode *singleRightRotate(WordNode *&t)
+  {
     WordNode *u = t->left;
     t->left = u->right;
     u->right = t;
@@ -124,7 +139,8 @@ class AVLTree {
     return u;
   }
 
-  WordNode *singleLeftRotate(WordNode *&t) {
+  WordNode *singleLeftRotate(WordNode *&t)
+  {
     WordNode *u = t->right;
     t->right = u->left;
     u->left = t;
@@ -133,17 +149,20 @@ class AVLTree {
     return u;
   }
 
-  WordNode *doubleLeftRotate(WordNode *&t) {
+  WordNode *doubleLeftRotate(WordNode *&t)
+  {
     t->right = singleRightRotate(t->right);
     return singleLeftRotate(t);
   }
 
-  WordNode *doubleRightRotate(WordNode *&t) {
+  WordNode *doubleRightRotate(WordNode *&t)
+  {
     t->left = singleLeftRotate(t->left);
     return singleRightRotate(t);
   }
 
-  WordNode *findMin(WordNode *t) {
+  WordNode *findMin(WordNode *t)
+  {
     if (t == NULL)
       return NULL;
     else if (t->left == NULL)
@@ -152,7 +171,8 @@ class AVLTree {
       return findMin(t->left);
   }
 
-  WordNode *findMax(WordNode *t) {
+  WordNode *findMax(WordNode *t)
+  {
     if (t == NULL)
       return NULL;
     else if (t->right == NULL)
@@ -161,7 +181,8 @@ class AVLTree {
       return findMax(t->right);
   }
 
-  WordNode *remove(string word, WordNode *t) {
+  WordNode *remove(string word, WordNode *t)
+  {
     WordNode *temp;
     int compareResult = stringCompare(word, t->word);
     // Element not found
@@ -175,13 +196,15 @@ class AVLTree {
 
     // Element found
     // With 2 children
-    else if (t->left && t->right) {
+    else if (t->left && t->right)
+    {
       temp = findMin(t->right);
       t->word = temp->word;
       t->right = remove(t->word, t->right);
     }
     // With one or zero child
-    else {
+    else
+    {
       temp = t;
       if (t->left == NULL)
         t = t->right;
@@ -196,7 +219,8 @@ class AVLTree {
 
     // If T is unbalanced
     // If left T is deleted, right case
-    if (height(t->left) - height(t->right) == 2) {
+    if (height(t->left) - height(t->right) == 2)
+    {
       // right right case
       if (height(t->left->left) - height(t->left->right) == 1)
         return singleLeftRotate(t);
@@ -205,7 +229,8 @@ class AVLTree {
         return doubleLeftRotate(t);
     }
     // If right T is deleted, left case
-    else if (height(t->right) - height(t->left) == 2) {
+    else if (height(t->right) - height(t->left) == 2)
+    {
       // left left case
       if (height(t->right->right) - height(t->right->left) == 1)
         return singleRightRotate(t);
@@ -218,19 +243,21 @@ class AVLTree {
 
   int height(WordNode *t) { return (t == NULL ? -1 : t->height); }
 
-  int getBalance(WordNode *t) {
+  int getBalance(WordNode *t)
+  {
     if (t == NULL)
       return 0;
     else
       return height(t->left) - height(t->right);
   }
 
-  void inorder(WordNode *t, vector<string> *fileNames) {
+  void inorder(WordNode *t, vector<string> *fileNames, string *str)
+  {
     if (t == NULL)
       return;
-    inorder(t->left, fileNames);
-    cout << t->toString(fileNames);
-    inorder(t->right, fileNames);
+    inorder(t->left, fileNames, str);
+    *str += t->toString(fileNames);
+    inorder(t->right, fileNames, str);
   }
 
 public:
@@ -240,8 +267,10 @@ public:
 
   void remove(string x) { root = remove(x, root); }
 
-  void display(vector<string> *fileNames) {
-    inorder(root, fileNames);
-    cout << endl;
+  string toString(vector<string> *fileNames)
+  {
+    string str = "";
+    inorder(root, fileNames, &str);
+    return str;
   }
 };
