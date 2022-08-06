@@ -19,12 +19,13 @@ using std::string;
 string normalizeWord(string word) {
   string normalizedWord = word;
   normalizedWord = trim(normalizedWord);
-  
-  normalizedWord.erase(std::remove_if(
-      normalizedWord.begin(), normalizedWord.end(),
-      [](char c) {
-    return c == ',' || c == '.' || c == '!' || c == '?'; }), normalizedWord.end());
-  
+
+  normalizedWord.erase(
+      std::remove_if(
+          normalizedWord.begin(), normalizedWord.end(),
+          [](char c) { return c == ',' || c == '.' || c == '!' || c == '?'; }),
+      normalizedWord.end());
+
   normalizedWord = toUpperCase(normalizedWord);
   return normalizedWord;
 }
@@ -36,21 +37,33 @@ void a(string directory, string selectedWord) {
 
   AVLTree *tree = new AVLTree();
 
-  print(normalizeWord("         test."));
-  function<void(string)> callback = [](string line) {
-    std::vector<std::string> lineWordsArray;
+  function<void(string, unsigned long long, unsigned int)> callback =
+      [&tree](string line, unsigned long long lineNumber, unsigned int fileIndex) {
+        std::vector<std::string> lineWordsArray;
 
-    split(line, lineWordsArray, ' ');
-    for (auto &w : lineWordsArray) {
-      string formattedWord = normalizeWord(w);
-      if (formattedWord == "")
-        continue;
+        split(line, lineWordsArray, ' ');
+        for (auto &w : lineWordsArray) {
+          string formattedWord = normalizeWord(w);
+          if (formattedWord == "")
+            continue;
 
-      // print(formattedWord);
-    }
-  };
+          WordNode *node = new WordNode();
 
-  for (int i = 0; i < files.size(); i++) {
+          FileNode *fileNode = new FileNode();
+
+          fileNode->count = 1;
+          fileNode->lines.insert(lineNumber);
+
+          node->word = formattedWord;
+          node->count = 1;
+
+          node->files[fileIndex]=*fileNode;
+
+          tree->insert(node);
+        }
+      };
+
+  for (unsigned int i = 0; i < files.size(); i++) {
     list<string>::iterator iter = files.begin();
     advance(iter, i);
     string filePath = *iter;
@@ -58,8 +71,10 @@ void a(string directory, string selectedWord) {
 
     print(fullFilePath);
 
-    readFile(fullFilePath, callback);
+    readFile(fullFilePath, callback, i);
   }
+
+  tree->display();
 }
 
 int main(int argc, char **argv) {

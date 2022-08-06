@@ -34,13 +34,15 @@ void split(const std::string &txt, std::vector<std::string> &strs, char ch) {
       txt.substr(initialPos, std::min(pos, txt.size()) - initialPos + 1));
 }
 
-void readFile(string path, function<void(string)> callback) {
+void readFile(string path, function<void(string, unsigned long long, unsigned int)> callback, unsigned int fileIndex) {
   ifstream file(path);
 
   string text;
 
+  unsigned long lineNumber = 1;
   while (getline(file, text)) {
-    callback(text);
+    callback(text, lineNumber, fileIndex);
+    lineNumber++;
   }
 
   file.close();
