@@ -14,6 +14,10 @@
 
 using namespace std;
 
+
+void print(string text) { std::cout << text + "\n"; }
+
+
 void readFile(string path, function<void (string)> callback) {
   ifstream file(path);
 

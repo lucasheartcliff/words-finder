@@ -26,13 +26,13 @@ class AVLTree {
     return generalMap->find(key) != generalMap->end();
   }
 
-  void *mergeOrCreateFileAssociation(WordNode *newT, WordNode *t) {
+  void mergeOrCreateFileAssociation(WordNode *newT, WordNode *t) {
     map<unsigned int, FileNode> *filesMap = &newT->files;
 
     if (filesMap != NULL && filesMap->size()) {
-      map<unsigned int, FileNode>::iterator iter = filesMap.begin();
+      map<unsigned int, FileNode>::iterator iter = filesMap->begin();
 
-      while (iter != filesMap.end()) {
+      while (iter != filesMap->end()) {
         unsigned int key = iter->first;
         FileNode value = iter->second;
 
@@ -50,7 +50,7 @@ class AVLTree {
     }
   }
 
-  void *mergeEqualsNode(WordNode *newT, WordNode *t) {
+  void mergeEqualsNode(WordNode *newT, WordNode *t) {
     t->count += newT->count;
     this->mergeOrCreateFileAssociation(newT, t);
   }
